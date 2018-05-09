@@ -1,0 +1,2 @@
+# manaus-lib
+Manaus library
