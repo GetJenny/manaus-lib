@@ -4,12 +4,9 @@ package com.getjenny.manaus
   * Created by Mario Alemi on 06/04/2017.
   */
 package object util {
-  val factorial: Map[Int, Double] =
-    Map((0, 1.0), (1, 1.0), (2, 2.0), (3, 6.0), (4, 24.0), (5, 120.0), (6, 720.0), (7, 5040.0))
-      .withDefault(x => x*factorial(x-1))
-
+  val factorial:Map[Int, Double] = Map((0, 1.0), (1, 1.0), (2, 2.0), (3, 6.0), (4, 24.0),
+    (5, 120.0), (6, 720.0), (7, 5040.0)).withDefault(x => x*factorial(x-1))
   def binomialFactor(n: Int, k: Int): Double = factorial(n)/(factorial(n-k)*factorial(k))
-
   def multinomialFactor(n: Int, k: List[Int]): Double = factorial(n)/ k.map(factorial(_)).product
 
   def bigramSet2tuple(bigram: Set[String]): (String, String) = {
@@ -43,7 +40,8 @@ package object util {
   /**
     * Ad-hoc tokenizer for our (private) test data.
     *
-    * @param line A string with the conversation in this format: """ "CLIENT: I want to renew a subscription...";"AGENT: Sure, tell me your name..."\n """
+    * @param line A string with the conversation in this format:
+    *             """ "CLIENT: I want to renew a subscription...";"AGENT: Sure, tell me your name..."\n """
     * @return List(List("CLIENT", "I want to renew a subscription..."), List("AGENT", "Sure, tell me your name..."))
     */
   def splitSentences(line: String): List[((String, String, List[String]), Int)] = {
@@ -53,16 +51,23 @@ package object util {
         if (splitLine.tail.isEmpty) {
           if (splitLine.head.trim.take(5) == "OTHER") pp
           else if (pp.isEmpty) splitLine.head.trim.stripPrefix("\"").stripSuffix("\"").split(": ").toList :: pp
-          else if (pp.head.head == "CLIENT" && splitLine.head.take(6) == "CLIENT") List("CLIENT", pp.head(1) + " " + splitLine.head.trim.stripPrefix("\"").stripSuffix("\"").split(": ")(1)) :: pp.tail
-          else if (pp.head.head == "AGENT" && splitLine.head.take(5) == "AGENT") List("AGENT", pp.head(1) + " " + splitLine.head.trim.stripPrefix("\"").stripSuffix("\"").split(": ")(1)) :: pp.tail
+          else if (pp.head.head == "CLIENT" && splitLine.head.take(6) == "CLIENT")
+            List("CLIENT", pp.head(1) + " " + splitLine.head.trim.stripPrefix("\"")
+              .stripSuffix("\"").split(": ")(1)) :: pp.tail
+          else if (pp.head.head == "AGENT" && splitLine.head.take(5) == "AGENT")
+            List("AGENT", pp.head(1) + " " + splitLine.head.trim.stripPrefix("\"")
+              .stripSuffix("\"").split(": ")(1)) :: pp.tail
           else splitLine.head.trim.stripPrefix("\"").stripSuffix("\"").split(": ").toList :: pp
         } else {
           if (splitLine.head.trim.take(5) == "OTHER") loop(pp, splitLine.tail)
-          else if (pp.isEmpty) loop(splitLine.head.trim.stripPrefix("\"").stripSuffix("\"").split(": ").toList :: pp, splitLine.tail)
+          else if (pp.isEmpty)
+            loop(splitLine.head.trim.stripPrefix("\"").stripSuffix("\"").split(": ").toList :: pp, splitLine.tail)
           else if (pp.head.head == "CLIENT" && splitLine.head.take(6) == "CLIENT")
-            loop( List("CLIENT", pp.head(1) + " " + splitLine.head.trim.stripPrefix("\"").stripSuffix("\"").split(": ")(1)) :: pp.tail, splitLine.tail)
+            loop( List("CLIENT", pp.head(1) + " " + splitLine.head.trim.stripPrefix("\"")
+              .stripSuffix("\"").split(": ")(1)) :: pp.tail, splitLine.tail)
           else if (pp.head.head == "AGENT" && splitLine.head.take(5) == "AGENT")
-            loop( List("AGENT", pp.head(1) + " " + splitLine.head.trim.stripPrefix("\"").stripSuffix("\"").split(": ")(1) ) :: pp.tail, splitLine.tail)
+            loop( List("AGENT", pp.head(1) + " " + splitLine.head.trim.stripPrefix("\"")
+              .stripSuffix("\"").split(": ")(1) ) :: pp.tail, splitLine.tail)
           else loop(splitLine.head.trim.stripPrefix("\"").stripSuffix("\"").split(": ").toList :: pp, splitLine.tail)
         }
       }

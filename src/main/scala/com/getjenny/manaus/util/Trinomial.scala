@@ -8,7 +8,8 @@ case class Trinomial(samples: Int, successes: List[Double]) {
   //////assert(successes.length == 2)
   val p: List[Double] = successes.map(_ * 1.0 / samples)
 
-  def pSuccess(n: Int,  k: List[Int]): Double = multinomialFactor(n, k) * p.zip(k).map(x => math.pow(x._1, x._2)).product
+  def pSuccess(n: Int,  k: List[Int]): Double =
+    multinomialFactor(n, k) * p.zip(k).map(x => math.pow(x._1, x._2)).product
 
   /**
     * Here we take the last "k" as the one we want to measure the significance. In the case of
@@ -18,7 +19,7 @@ case class Trinomial(samples: Int, successes: List[Double]) {
     * @return
     */
   def areaFromEnd(n: Int, k: List[Int]): Double = {
-    assert(k.length == 3, "Works only for 3 dimensions ATM " + k)
+    assert(k.lengthCompare(3) == 0, "Works only for 3 dimensions ATM " + k)
     //TODO should be 0 to n or 1 to n?
     val kComb = for (i <- 0 to n; j <- 0 to n; l <- k(2) to n if i + j + l == n) yield (i, j, l)
 

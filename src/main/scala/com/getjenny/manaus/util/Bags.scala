@@ -32,7 +32,9 @@ case class Bags(bags: List[(List[String], Set[String])]) {
   // A Map Set(Bigram_1, Bigram_2) -> Occurrences of both words Bigram_1 and Bigram_2 in the same bag
   //TODO Inefficient?
   val m11: Map[Set[String], Int] =
-    (for (bag <- bags) yield for (w1 <- bag._2; w2 <- bag._2 if w1 < w2) yield Set(w1, w2) ).flatten.groupBy(identity).mapValues(_.length).withDefaultValue(0)
+    (for (bag <- bags)
+      yield for (w1 <- bag._2; w2 <- bag._2 if w1 < w2)
+        yield Set(w1, w2) ).flatten.groupBy(identity).mapValues(_.length).withDefaultValue(0)
 
   /**
     * How often the first word appear, and the second word doesn't, in all bags?
@@ -45,13 +47,15 @@ case class Bags(bags: List[(List[String], Set[String])]) {
 
   // Map Set(Bigram_1, Bigram_2) -> Occurrences of neither word Bigram_1 nor Bigram_2 in a bag
   //val m00: Map[Set[String], Int] = (for (bag <- bags) yield for (w1 <- vocabulary.diff(bag); w2 <- vocabulary.diff(bag)) yield Set(w1, w2) ).flatten.groupBy(x=>x).map(x => (x._1, x._2.length)).withDefaultValue(0)
-  def m00(bigram: Set[String]): Int = bags.length - m11(bigram) - m10((bigram.head, bigram.tail.head)) - m10((bigram.tail.head, bigram.head))
+  def m00(bigram: Set[String]): Int =
+    bags.length - m11(bigram) - m10((bigram.head, bigram.tail.head)) - m10((bigram.tail.head, bigram.head))
 
   // Total number of produced bigrams
   val nBigrams: Int = m11.values.sum
 
   // List of List of 2 words, each ordered by decreasing occurrence
-  val orderedBigrams: List[List[String]] = m11.toList.map(_._1.toList.sortBy(-occurrences(_))).filter(_.length == 2)
+  val orderedBigrams: List[List[String]] =
+    m11.toList.map(_._1.toList.sortBy(-occurrences(_))).filter(_.lengthCompare(2) == 0)
 
   // Trigrams and associated occurrences
   //TODO NB filtering out occ < 2)
@@ -63,9 +67,13 @@ case class Bags(bags: List[(List[String], Set[String])]) {
 
   // trigrams.contains(b.union(Set(w)))  because we are only interested in trigrams that exist
   val m110: Map[(String, String, String), Int] =
-    (for (bag <- bags) yield for (t <- trigrams if t.size == 3 &&
-      bag._2.contains(t.head) && bag._2.contains(t.tail.head) &&  !bag._2.contains(t.tail.tail.head) )
-      yield (t.head, t.tail.head, t.tail.tail.head)).flatten.groupBy(x=>x).map(x => (x._1, x._2.length)).withDefaultValue(0)
+    (for (bag <- bags)
+      yield for (t <- trigrams if t.size == 3 &&
+        bag._2.contains(t.head) &&
+        bag._2.contains(t.tail.head) &&
+        !bag._2.contains(t.tail.tail.head) )
+      yield (t.head, t.tail.head, t.tail.tail.head)).flatten.groupBy(x=>x)
+        .map(x => (x._1, x._2.length)).withDefaultValue(0)
 
   val m100: Map[(String, String, String), Int] =
     (for (bag <- bags) yield for (t <- trigrams if t.size == 3 &&
@@ -82,7 +90,8 @@ case class Bags(bags: List[(List[String], Set[String])]) {
   val nTrigrams: Int = m111.values.sum
 
   // List of List of 3 words, each ordered by decreasing occurrence
-  val orderedTrigrams: List[List[String]] = m111.toList.map(_._1.toList.sortBy(-occurrences(_))).filter(_.length == 3)
+  val orderedTrigrams: List[List[String]] =
+    m111.toList.map(_._1.toList.sortBy(-occurrences(_))).filter(_.lengthCompare(3) == 0)
 
   /**
     * The LLR Score for Bigrams
@@ -123,10 +132,12 @@ case class Bags(bags: List[(List[String], Set[String])]) {
     */
   val binomialSignificativeBigramsExact: List[(Set[String], Double)] = (for (b <- m11.keys if b.size == 2)
     yield (b, Trinomial(nBigrams, expectedTriOccurrence(nBigrams, occurrences(b.head), occurrences(b.tail.head)))
-      .rightSurprise(nBigrams, List(m00(b), m10(bigramSet2tuple(b))+m10(bigramSet2tupleInverted(b)), m11(b)) ))).toList.sortBy(-_._2)
+      .rightSurprise(nBigrams, List(m00(b), m10(bigramSet2tuple(b))+m10(bigramSet2tupleInverted(b)), m11(b)) )))
+      .toList.sortBy(-_._2)
 
   val sb: List[Set[String]] = binomialSignificativeBigrams.filter(_._2 > 8).map(_._1.toSet)
-  val bigramWord: List[(Set[String], String)] =  for (b <- sb; t <- trigrams if t.intersect(b) == b) yield (b, t.diff(b).head)
+  val bigramWord: List[(Set[String], String)] =  for (b <- sb; t <- trigrams if t.intersect(b) == b)
+    yield (b, t.diff(b).head)
 
   def trinomialSignificativeTrigrams(): Map[Set[String], Double] = {
     def loop(acc: Map[Set[String], Double], bigramWord: List[(Set[String], String)] ): Map[Set[String], Double] = {
@@ -141,9 +152,6 @@ case class Bags(bags: List[(List[String], Set[String])]) {
     }
     loop(acc=Map().withDefaultValue(0.0), bigramWord)
   }
-
-
-
 
   // val bags = List(Set("A", "B"), Set("A", "B", "C"), Set("A", "B", "D"), Set("E", "F"), Set("C"), Set("C"), Set("C"), Set("C"))
 }

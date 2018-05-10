@@ -1,5 +1,3 @@
-import NativePackagerHelper._
-
 name := "manaus-lib"
 
 organization := "com.getjenny"
@@ -45,7 +43,7 @@ publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
 
-homepage := Some(url("http://www.getjenny.io"))
+homepage := Some(url("http://www.getjenny.com"))
 
 scmInfo := Some(
   ScmInfo(

@@ -1,9 +1,7 @@
 package com.getjenny.manaus
 
-import com.getjenny.manaus.util.Binomial
+import com.getjenny.manaus.util._
 import com.typesafe.scalalogging.LazyLogging
-
-import scala.collection.SeqView
 
 
 /** Created by Mario Alemi on 07/04/2017 in El Estrecho, Putumayo, Peru
@@ -22,7 +20,8 @@ import scala.collection.SeqView
     val occurrenceColumn = 2
     val filePath = "/Users/mal/pCloud/Data/word_frequency.tsv"
     val priorOccurrences: Map[String, Int] = (for (line <- Source.fromFile(filePath).getLines)
-      yield (line.split("\t")(wordColumn).toLowerCase -> line.split("\t")(occurrenceColumn).toInt)).toMap.withDefaultValue(0)
+      yield (line.split("\t")(wordColumn).toLowerCase -> line.split("\t")(occurrenceColumn).toInt))
+        .toMap.withDefaultValue(0)
     // instantiate the Conversations
     val rawConversations = Source.fromFile("/Users/mal/pCloud/Scala/manaus/convs.head.csv").getLines.toList
     val conversations = new Conversations(rawConversations=rawConversations, tokenizer=tokenizer,
@@ -33,8 +32,8 @@ import scala.collection.SeqView
   * @param observedOccurrences occurrence of terms into the observed vocabulary
   *
   */
-class KeywordsExtraction(priorOccurrences: TokensOccurrences,
-                         observedOccurrences: TokensOccurrences) extends LazyLogging {
+class KeywordsExtraction(priorOccurrences: TokenOccurrence,
+                         observedOccurrences: TokenOccurrence) extends LazyLogging {
 
   /**
     * @param sentence_tokens list of sentence tokens
@@ -48,11 +47,11 @@ class KeywordsExtraction(priorOccurrences: TokensOccurrences,
       sentence_tokens.groupBy(identity).mapValues(_.length)
 
     val wordsInfo: Map[String, Double] = sentence_tokens.map(token => {
-      (token, observedOccurrences.getOccurrence(token))
+      (token, observedOccurrences.tokenOccurrence(token))
     }).filter(_._2 > 0).map(token => {
       (token._1,
-        Binomial(priorOccurrences.getTokenN + observedOccurrences.getTokenN,
-          observedOccurrences.getOccurrence(token._1) + priorOccurrences.getOccurrence(token._1))
+        Binomial(priorOccurrences.totalNumberOfTokens + observedOccurrences.totalNumberOfTokens,
+          observedOccurrences.tokenOccurrence(token._1) + priorOccurrences.tokenOccurrence(token._1))
           .rightSurprise(sentence_tokens.length, localOccurrences(token._1)))
     }).toMap
 
@@ -65,8 +64,9 @@ class KeywordsExtraction(priorOccurrences: TokensOccurrences,
     def keywordsNotNorm: List[(String, Double)]  = {
       if (totalInformation <= minSentenceInfoBit)
         List()
-      else
-        wordsInfo.filter(x => x._2 > minKeywordInfo).mapValues(_.toDouble).toList.sortBy(-_._2)
+      else {
+        wordsInfo.filter(x => x._2 > minKeywordInfo).toList.sortBy(- _._2)
+      }
     }
 
     /**
@@ -80,7 +80,7 @@ class KeywordsExtraction(priorOccurrences: TokensOccurrences,
         wordsInfo.filter(x => x._2 > minKeywordInfo).mapValues(_/totalInformation).toList.sortBy(-_._2)
     }
 
-    def keywords = if (totalInformationNorm) keywordsNormTotalInfo else keywordsNotNorm
+    def keywords: List[(String, Double)] = if (totalInformationNorm) keywordsNormTotalInfo else keywordsNotNorm
   }
 
   /** Clean a list of tokens e.g. No words with two letters,
@@ -92,9 +92,9 @@ class KeywordsExtraction(priorOccurrences: TokensOccurrences,
     */
   def pruneSentence(sentence: List[String],
                     minObservedNForPruning: Int = 100000, min_chars: Int = 2): List[String] = {
-    val pruned_sentence = if (observedOccurrences.getTokenN > minObservedNForPruning)
+    val pruned_sentence = if (observedOccurrences.totalNumberOfTokens > minObservedNForPruning)
       sentence.filter(_.length > min_chars).map(token => token)
-        .map(token => (token, observedOccurrences.getOccurrence(token))).filter(_._2 > 1)
+        .map(token => (token, observedOccurrences.tokenOccurrence(token))).filter(_._2 > 1)
         .map(_._1)
     else
       sentence.filter(_.length > min_chars)
@@ -113,7 +113,7 @@ class KeywordsExtraction(priorOccurrences: TokensOccurrences,
                               totalInformationNorm: Boolean):
                       List[(String, Double)] = {
     val pruned = this.pruneSentence(sentence)
-    val filtered = if(pruned.length > minWordsPerSentence) pruned else List.empty[String]
+    val filtered = if(pruned.lengthCompare(minWordsPerSentence) > 0) pruned else List.empty[String]
     val keywords = if(filtered.nonEmpty) new Sentence(sentence_tokens = filtered,
       totalInformationNorm = totalInformationNorm).keywords else List.empty[(String, Double)]
     keywords
@@ -138,8 +138,8 @@ class KeywordsExtraction(priorOccurrences: TokensOccurrences,
     val extractedKeywords: Map[String, Double] =
       informativeKeywordsFrequency.map(p => {
         val pair = (p._1,
-          Binomial(priorOccurrences.getTokenN + observedOccurrences.getTokenN,
-            observedOccurrences.getOccurrence(p._1) + priorOccurrences.getOccurrence(p._1)
+          Binomial(priorOccurrences.totalNumberOfTokens + observedOccurrences.totalNumberOfTokens,
+            observedOccurrences.tokenOccurrence(p._1) + priorOccurrences.tokenOccurrence(p._1)
           ).activePotential(p._2, decay)
         )
         pair
