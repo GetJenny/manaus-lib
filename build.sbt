@@ -61,10 +61,11 @@ developers := List(
   )
 )
 
+val stagingName = "manaus-lib-" + version
 releaseProcess := Seq[ReleaseStep](
-		releaseStepCommand("+ sonatypeOpen \"com.getjenny\" \"manaus-lib\""),
-		releaseStepCommand("publishSigned"),
-		releaseStepCommand("sonatypeRelease")
+		releaseStepCommand("+ sonatypeOpen \"com.getjenny\" \"" + stagingName + "\""),
+		releaseStepCommand("+ publishSigned"),
+		releaseStepCommand("+ sonatypeRelease")
 )
 
 licenses := Seq(("GPLv2", url("https://www.gnu.org/licenses/old-licenses/gpl-2.0.md")))
