@@ -61,9 +61,8 @@ developers := List(
   )
 )
 
-val stagingName = "manaus-lib-" + version
 releaseProcess := Seq[ReleaseStep](
-		releaseStepCommand("+ sonatypeOpen \"com.getjenny\" \"" + stagingName + "\""),
+		releaseStepCommand("+ sonatypeOpen \"com.getjenny\" \"manaus-lib\""),
 		releaseStepCommand("+ publishSigned"),
 		releaseStepCommand("+ sonatypeRelease")
 )
