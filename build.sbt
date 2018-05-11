@@ -37,6 +37,8 @@ publishTo := {
     Some("releases"  at nexus + "service/local/staging/deploy/maven3")
 }
 
+releaseCrossBuild := true
+
 publishMavenStyle := true
 
 publishArtifact in Test := false
@@ -62,9 +64,9 @@ developers := List(
 )
 
 releaseProcess := Seq[ReleaseStep](
-		releaseStepCommand("+ sonatypeOpen \"com.getjenny\" \"manaus-lib\""),
-		releaseStepCommand("+ publishSigned"),
-		releaseStepCommand("+ sonatypeRelease")
+		releaseStepCommand("sonatypeOpen \"com.getjenny\" \"manaus-lib\""),
+		releaseStepCommand("publishSigned"),
+		releaseStepCommand("sonatypeRelease")
 )
 
 licenses := Seq(("GPLv2", url("https://www.gnu.org/licenses/old-licenses/gpl-2.0.md")))
