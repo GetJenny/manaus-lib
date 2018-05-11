@@ -16,7 +16,7 @@ libraryDependencies ++= {
     "org.apache.logging.log4j" % "log4j-core" % "2.9.1",
     "ch.qos.logback"    %  "logback-classic" % "1.2.3",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
-    "com.github.scopt" %% "scopt" % "3.6.0"
+    "com.github.scopt" %% "scopt" % "3.7.0"
   )
 }
 
