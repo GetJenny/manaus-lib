@@ -8,10 +8,11 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
   Resolver.bintrayRepo("hseeberger", "maven"))
 
 libraryDependencies ++= {
+  val BreezeVersion     = "0.13.2"
   Seq(
     "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-    "org.scalanlp" %% "breeze" % "0.13",
-    "org.scalanlp" %% "breeze-natives" % "0.13",
+    "org.scalanlp" %% "breeze" % BreezeVersion,
+    "org.scalanlp" %% "breeze-natives" % BreezeVersion,
     "org.apache.logging.log4j" % "log4j-api" % "2.9.1",
     "org.apache.logging.log4j" % "log4j-core" % "2.9.1",
     "ch.qos.logback"    %  "logback-classic" % "1.2.3",
