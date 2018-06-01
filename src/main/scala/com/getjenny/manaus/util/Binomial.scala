@@ -24,6 +24,6 @@ case class Binomial(samples: Long, successes: Double) {
     * Active potential is defined as the surprise associated to penalize words which
     * doesn't occur enough
     */
-  def activePotential(k: Int, d: Int = 10): Double = 1 - math.exp(-k/d)
+  def activePotential(k: Long, d: Long = 10): Double = 1 - math.exp(-k/d)
 
 }
