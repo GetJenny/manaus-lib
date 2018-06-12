@@ -38,8 +38,6 @@ publishTo := {
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
 
-isSnapshot := true
-
 releaseCrossBuild := true
 
 publishMavenStyle := true
