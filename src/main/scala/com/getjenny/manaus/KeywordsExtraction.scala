@@ -100,16 +100,21 @@ class KeywordsExtraction(priorOccurrences: TokenOccurrence,
     *   will have tuple like (original words, keywords, bigrams...)
     * @param sentence a sentence as a list of words
     * @param pruneSentence a threshold on the number of terms for trigger pruning
+    * minSentenceInfoBit the minimum amount of information for the sentence in bits
+    * minKeywordInfo the minimum amount of information per keywords in bits
     * @param minWordsPerSentence the minimum amount of words on each sentence
     * @return the list of most informative words for each sentence
     */
   def extractInformativeWords(sentence: List[String], pruneSentence: Int = 100000, minWordsPerSentence: Int = 10,
-                              totalInformationNorm: Boolean):
+                              minSentenceInfoBit: Int = 32, minKeywordInfo: Int = 8, totalInformationNorm: Boolean):
   List[(String, Double)] = {
     val pruned = this.pruneSentence(sentence)
     val filtered = if(pruned.lengthCompare(minWordsPerSentence) > 0) pruned else List.empty[String]
     val keywords = if(filtered.nonEmpty) new Sentence(sentence_tokens = filtered,
-      totalInformationNorm = totalInformationNorm).keywords else List.empty[(String, Double)]
+      minSentenceInfoBit = minSentenceInfoBit,
+      minKeywordInfo = minKeywordInfo,
+      totalInformationNorm = totalInformationNorm
+    ).keywords else List.empty[(String, Double)]
     keywords
   }
 
