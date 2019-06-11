@@ -46,6 +46,8 @@ publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
 
+excludeFilter in unmanagedResources := HiddenFileFilter || "log*.xml"
+
 homepage := Some(url("http://www.getjenny.com"))
 
 scmInfo := Some(
