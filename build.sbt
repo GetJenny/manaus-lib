@@ -4,22 +4,23 @@ organization := "com.getjenny"
 
 crossScalaVersions := Seq("2.12.10")
 
-resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
+resolvers ++= Seq("Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/",
   Resolver.bintrayRepo("hseeberger", "maven"))
 
 libraryDependencies ++= {
   val BreezeVersion     = "1.0"
   val ScalatestVersion  = "3.1.1"
   val ScoptVersion      = "3.7.0"
+  val LogbackVersion	= "1.2.3"
   Seq(
     "org.scalatest" %% "scalatest" % ScalatestVersion % "test",
     "org.scalanlp" %% "breeze" % BreezeVersion,
     "org.scalanlp" %% "breeze-natives" % BreezeVersion,
     "org.apache.logging.log4j" % "log4j-api" % "2.9.1",
     "org.apache.logging.log4j" % "log4j-core" % "2.9.1",
-    "ch.qos.logback"    %  "logback-classic" % "1.2.3",
+    "ch.qos.logback"  %  "logback-classic" % LogbackVersion,
     "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
-    "com.github.scopt" %% "scopt" % "ScoptVersion
+    "com.github.scopt" %% "scopt" % ScoptVersion
   )
 }
 
