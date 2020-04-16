@@ -1,0 +1,36 @@
+language: scala
+
+scala:
+   - 2.12.10
+
+jdk:
+   - openjdk11
+
+stages:
+  - name: compile
+  - name: test
+  - name: publish
+    if: ((branch = master AND type = push) OR (tag IS present)) AND NOT fork
+
+jobs:
+  include:
+    - stage: compile
+      name: "Compile project"
+      script: sbt ++$TRAVIS_SCALA_VERSION clean compile
+    - stage: test
+      name: "Run tests"
+      script:
+        - sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
+        - bash <(curl -Ls https://coverage.codacy.com/get.sh) 
+    - stage: publish
+      name: "Publish to oss.sonatype.org"
+      script: sbt ++$TRAVIS_SCALA_VERSION ci-release
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/15b5367e5ba965a65a9a
+    on_success: change
+    on_failure: always
+    on_start: never
+
